@@ -1,7 +1,5 @@
 mod message;
 
-use std::time::Duration;
-
 use kanal::{bounded, unbounded, Receiver, Sender};
 
 std::include!("settings.in");

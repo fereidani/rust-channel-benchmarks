@@ -173,7 +173,7 @@ def chart(benchs, names):
         normalize_rows(rows)
         for (name, row) in rows:
             chart.add(name, row)
-        chart.render_to_png("plot_{}.png".format(bench_name))
+        chart.render_to_png("target/plot_{}.png".format(bench_name))
 
 
 def main():
