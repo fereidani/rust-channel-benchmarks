@@ -1,0 +1,115 @@
+[package]
+name = "benchmarks"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+async-channel = "1.6.1"
+atomicring = "1.2"
+bus = "2.0"
+chan = "0.1"
+crossbeam = "0.8"
+crossbeam-channel = "0.5"
+crossbeam-deque = "0.8"
+flume = "0.10"
+futures = { version = "0.3", features = ["thread-pool"] }
+lockfree = "0.5"
+mpmc = "0.1"
+tokio = { version = "1", features = ["full"] }
+kanal= "0.1.0-beta1"
+
+[profile.release]
+opt-level = 3
+debug = false
+#rustc-env = {target-cpus = "native",tune-cpu="native",embed-bitcode="yes"}
+#split-debuginfo = '...'  # Platform-specific.
+debug-assertions = false
+overflow-checks = false
+#lto = true
+lto = 'thin'
+panic = 'abort'
+codegen-units = 1
+rpath = false
+
+
+[[bin]]
+name = "atomicring"
+path = "atomicring.rs"
+doc = false
+
+[[bin]]
+name = "atomicringqueue"
+path = "atomicringqueue.rs"
+doc = false
+
+[[bin]]
+name = "bus"
+path = "bus.rs"
+doc = false
+
+[[bin]]
+name = "chan"
+path = "chan.rs"
+doc = false
+
+[[bin]]
+name = "crossbeam-channel"
+path = "crossbeam-channel.rs"
+doc = false
+
+[[bin]]
+name = "kanal"
+path = "kanal.rs"
+doc = false
+
+
+[[bin]]
+name = "kanal-async"
+path = "kanal-async.rs"
+doc = false
+
+
+[[bin]]
+name = "crossbeam-deque"
+path = "crossbeam-deque.rs"
+doc = false
+
+[[bin]]
+name = "flume"
+path = "flume.rs"
+doc = false
+
+[[bin]]
+name = "flume-async"
+path = "flume-async.rs"
+doc = false
+
+[[bin]]
+name = "futures-channel"
+path = "futures-channel.rs"
+doc = false
+
+[[bin]]
+name = "lockfree"
+path = "lockfree.rs"
+doc = false
+
+[[bin]]
+name = "mpsc"
+path = "mpsc.rs"
+doc = false
+
+[[bin]]
+name = "segqueue"
+path = "segqueue.rs"
+doc = false
+
+[[bin]]
+name = "mpmc"
+path = "mpmc.rs"
+doc = false
+
+[[bin]]
+name = "async-channel"
+path = "async-channel.rs"
+doc = false
