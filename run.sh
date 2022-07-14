@@ -5,17 +5,15 @@ cd "$(dirname "$0")"
 
 #rm -rf *.csv
 
-mkdir -p target
+cargo run --release --bin mpsc | tee mpsc.csv
+cargo run --release --bin futures-channel | tee futures-channel.csv
+cargo run --release --bin flume | tee flume.csv
+cargo run --release --bin flume_async | tee flume_async.csv
+cargo run --release --bin crossbeam-channel | tee crossbeam-channel.csv
+cargo run --release --bin async-channel | tee async-channel.csv
+cargo run --release --bin kanal | tee kanal.csv
+cargo run --release --bin kanal-async | tee kanal-async.csv
 
-cargo run --release --bin mpsc | tee target/mpsc.csv
-cargo run --release --bin futures-channel | tee target/futures-channel.csv
-cargo run --release --bin flume | tee target/flume.csv
-cargo run --release --bin flume-async | tee target/flume_async.csv
-cargo run --release --bin crossbeam-channel | tee target/crossbeam-channel.csv
-cargo run --release --bin async-channel | tee target/async-channel.csv
-cargo run --release --bin kanal | tee target/kanal.csv
-cargo run --release --bin kanal-async | tee target/kanal-async.csv
+go run go.go | tee go.csv
 
-go run go.go | tee target/go.csv
-
-./plot.py target/*.csv
+./plot.py ./*.csv

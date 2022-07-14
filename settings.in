@@ -1,6 +1,3 @@
-#[allow(dead_code)]
 const MESSAGES: usize = 5000000;
-#[allow(dead_code)]
 const THREADS: usize = 4;
-#[allow(dead_code)]
 const THREADS_SELECT: usize = 4;

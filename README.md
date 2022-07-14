@@ -18,8 +18,7 @@ Default configuration:
 
 Runs benchmarks, stores results into `*.txt` files, and generates `plot.png`:
 
-```bash
-# Results will be saved in `target`.
+```
 ./run.sh
 ```
 
@@ -30,7 +29,6 @@ Dependencies:
 - Bash
 - Python 2
 - pygal
-- cairosvg
 
 ### Results
 

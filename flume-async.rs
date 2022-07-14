@@ -1,6 +1,6 @@
 mod message;
 
-use flume::{bounded, unbounded, Receiver, Sender};
+use flume::{bounded, unbounded, Receiver, Selector, Sender};
 
 std::include!("settings.in");
 
@@ -92,6 +92,20 @@ async fn spsc(cap: Option<usize>) {
 
 #[tokio::main]
 async fn main() {
+    macro_rules! run {
+        ($name:expr, $f:expr) => {
+            let now = ::std::time::Instant::now();
+            $f;
+            let elapsed = now.elapsed();
+            println!(
+                "{:25} {:15} {:7.3} sec",
+                $name,
+                "Rust kanal",
+                elapsed.as_secs() as f64 + elapsed.subsec_nanos() as f64 / 1e9
+            );
+        };
+    }
+
     macro_rules! run {
         ($name:expr, $f:expr) => {
             let now = ::std::time::Instant::now();

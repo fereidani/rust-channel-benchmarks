@@ -1,6 +1,6 @@
 mod message;
 
-use flume::{bounded, unbounded, Receiver, Sender};
+use flume::{bounded, unbounded, Receiver, Selector, Sender};
 
 std::include!("settings.in");
 
