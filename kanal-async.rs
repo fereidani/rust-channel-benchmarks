@@ -1,7 +1,5 @@
 mod message;
 
-use std::time::Duration;
-
 use kanal::{bounded_async, unbounded_async, AsyncReceiver, AsyncSender};
 
 std::include!("settings.in");
