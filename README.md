@@ -16,7 +16,7 @@ Default configuration:
 
 ### Running
 
-Runs benchmarks, stores results into `*.txt` files, and generates `plot.png`:
+Runs benchmarks, stores results into `*.csv` files in the target folder, and generates multiple png file for each test category:
 
 ```bash
 # Results will be saved in `target`.
