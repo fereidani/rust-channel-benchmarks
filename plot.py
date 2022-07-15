@@ -32,10 +32,10 @@ labels = ["seq", "spsc", "mpsc", "mpmc"]  # "select_rx", "select_both"
 
 
 titles = {
-    "unbounded": "Unbounded Channel Benchmark",
-    "bounded": "Bounded Channel With Size N Benchmark",
-    "bounded0": "Bounded Channel With Size 0 Benchmark",
-    "bounded1": "Bounded Channel With Size 1 Benchmark",
+    "unbounded": "Unbounded Channel Benchmark\n(Relative time, lower is better)",
+    "bounded": "Bounded Channel With Size N Benchmark\n(Relative time, lower is better)",
+    "bounded0": "Bounded Channel With Size 0 Benchmark\n(Relative time, lower is better)",
+    "bounded1": "Bounded Channel With Size 1 Benchmark\n(Relative time, lower is better)",
 }
 
 
