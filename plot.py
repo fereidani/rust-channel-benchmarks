@@ -123,7 +123,8 @@ def make_rows(bench_name, bench, names):
         row = []
         for label in x_labels:
             if name in bench[label]:
-                row.append(round(bench[label][name]/1e9, 2))
+                # row.append(round(bench[label][name]/1e9, 2)) # convert to seconds
+                row.append(bench[label][name])
             else:
                 row.append(None)
 
