@@ -28,7 +28,7 @@ Dependencies:
 - Rust (latest)
 - Go
 - Bash
-- Python 2 or Python 3
+- Python
 - pygal
 - cairosvg
 
