@@ -15,8 +15,8 @@ flume = "0.10"
 futures = { version = "0.3", features = ["thread-pool"] }
 lockfree = "0.5"
 mpmc = "0.1"
-tokio = { version = "1", features = ["full"] }
-kanal= "0.1.0-beta1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+kanal= "0.1.0-beta2"
 
 [profile.release]
 opt-level = 3
