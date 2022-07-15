@@ -28,16 +28,23 @@ Dependencies:
 - Rust (latest)
 - Go
 - Bash
+- libcairo2-dev
 - Python
-- pygal
-- cairosvg
+  - pygal
+  - cairosvg
+
+### Contributing
+
+You can follow [community benchmarks](https://github.com/fereidani/rust-channel-benchmarks/issues?q=label%3Abenchmark), and also share your results by opening an issue with the format shown in [results](#Results) section.
 
 ### Results
 
-Machine: AMD Ryzen Threadripper 2950X 16-Core Processor
-Rust: `rustc 1.62.0`
-Go: `go version go1.18.3 linux/amd64`
-July 14 2022
+
+Machine: `AMD Ryzen Threadripper 2950X 16-Core Processor`<br />
+Rust: `rustc 1.62.0`<br />
+Go: `go version go1.18.3 linux/amd64`<br />
+OS (`uname -a`): `Linux 5.13.0-35-generic #40~20.04.1-Ubuntu SMP Mon Mar 7 09:18:32 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux`<br />
+Date: July 14, 2022
 
 ![Benchmark bounded channel with size 0](https://i.imgur.com/vEBirUw.png)
 ![Benchmark bounded channel with size 1](https://i.imgur.com/iDETIAK.png)
