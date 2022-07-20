@@ -1,21 +1,41 @@
 #!/bin/bash
 set -euxo pipefail
 IFS=$'\n\t'
+SLEEP_SEC=5
 cd "$(dirname "$0")"
 
 #rm -rf *.csv
 
 mkdir -p target
 
-cargo run --release --bin mpsc | tee target/mpsc.csv
-cargo run --release --bin futures-channel | tee target/futures-channel.csv
-cargo run --release --bin flume | tee target/flume.csv
-cargo run --release --bin flume-async | tee target/flume_async.csv
-cargo run --release --bin crossbeam-channel | tee target/crossbeam-channel.csv
-cargo run --release --bin async-channel | tee target/async-channel.csv
-cargo run --release --bin kanal | tee target/kanal.csv
-cargo run --release --bin kanal-async | tee target/kanal-async.csv
+cargo build --release --bin mpsc
+cargo build --release --bin futures-channel
+cargo build --release --bin flume
+cargo build --release --bin flume-async
+cargo build --release --bin crossbeam-channel
+cargo build --release --bin async-channel
+cargo build --release --bin kanal
+cargo build --release --bin kanal-async
+go build -o target/release/go_bench go.go
 
-go run go.go | tee target/go.csv
+
+sleep $SLEEP_SEC
+./target/release/mpsc | tee target/mpsc.csv
+sleep $SLEEP_SEC
+./target/release/futures-channel | tee target/futures-channel.csv
+sleep $SLEEP_SEC
+./target/release/flume | tee target/flume.csv
+sleep $SLEEP_SEC
+./target/release/flume-async | tee target/flume_async.csv
+sleep $SLEEP_SEC
+./target/release/crossbeam-channel | tee target/crossbeam-channel.csv
+sleep $SLEEP_SEC
+./target/release/async-channel | tee target/async-channel.csv
+sleep $SLEEP_SEC
+./target/release/kanal | tee target/kanal.csv
+sleep $SLEEP_SEC
+./target/release/kanal-async | tee target/kanal-async.csv
+sleep $SLEEP_SEC 
+./target/release/go_bench | tee target/go.csv
 
 ./plot.py target/*.csv
