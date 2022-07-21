@@ -203,7 +203,7 @@ def chart(benchs, names):
     imgs = []
     for bench_name in benchs:
         imgs.append(Image.open("target/plot_{}.png".format(bench_name)))
-    concat_vertical(imgs, "target/out.png")
+    concat_vertical(imgs, "target/results.png")
 
 
 def main():
