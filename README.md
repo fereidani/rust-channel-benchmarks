@@ -33,6 +33,7 @@ Dependencies:
   - pygal
   - cairosvg
   - tk
+  - PIL
 
 ### Contributing
 

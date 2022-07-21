@@ -3,6 +3,7 @@ import sys
 from turtle import width
 from unittest import TestCase
 import pygal
+from PIL import Image
 
 
 def read_data(files):
@@ -43,10 +44,10 @@ def sortFn(key):
 
 
 titles = {
-    "unbounded": "Unbounded Channel Benchmark\n(Relative time, lower is better)",
-    "bounded": "Bounded Channel With Size N Benchmark\n(Relative time, lower is better)",
     "bounded0": "Bounded Channel With Size 0 Benchmark\n(Relative time, lower is better)",
     "bounded1": "Bounded Channel With Size 1 Benchmark\n(Relative time, lower is better)",
+    "bounded": "Bounded Channel With Size N Benchmark\n(Relative time, lower is better)",
+    "unbounded": "Unbounded Channel Benchmark\n(Relative time, lower is better)",
 }
 
 
@@ -117,7 +118,6 @@ def get_color(name):
     for k in color_set:
         if k not in reserved:
             colors[name] = k
-            print(color_set[k])
             return color_set[k]
 
 
@@ -130,7 +130,6 @@ def make_rows(bench_name, bench, names):
         if label in bench_keys:
             x_labels.append(label)
 
-    print(bench_name, x_labels)
     rows = []
     for name in names:
         row = []
@@ -140,14 +139,8 @@ def make_rows(bench_name, bench, names):
                 row.append(bench[label][name])
             else:
                 row.append(None)
-
-        # if not is_all_none(row):
-        #    rows.append((name, row))
-        #    print(name, row)
         rows.append((name, row))
-    print(x_labels)
     return rows, x_labels
-    # print(bench)
 
 
 def normalize_rows(rows):
@@ -158,6 +151,18 @@ def normalize_rows(rows):
     for idx, (name, row) in enumerate(rows):
         rows[idx] = (
             name, [round(i / j, 2) if i is not None else 0 for i, j in zip(row, norm)])
+
+
+def concat_vertical(imgs, to):
+    height_sum = 0
+    for img in imgs:
+        height_sum += img.height+5
+    output = Image.new('RGB', (imgs[0].width, height_sum))
+    last_height = 0
+    for img in imgs:
+        output.paste(img, (0, last_height))
+        last_height += img.height+5
+    output.save(to)
 
 
 def chart(benchs, names):
@@ -174,11 +179,15 @@ def chart(benchs, names):
         custom_style = pygal.style.Style(
             colors=bar_colors, value_font_size=9,
             value_colors=bar_colors,
+            legend_font_size=10,
+            title_font_size=12,
         )
         chart = pygal.Bar(
+            margin=5,
             width=1200,
             height=350,
-            legend_at_bottom=True,
+            max_scale=5,
+            # legend_at_bottom=True,
             print_values=True,
             print_values_position='top',
             value_formatter=lambda x: '{}x'.format(
@@ -190,6 +199,11 @@ def chart(benchs, names):
         for (name, row) in rows:
             chart.add(name, row)
         chart.render_to_png("target/plot_{}.png".format(bench_name))
+        chart.render_to_file("target/plot_{}.svg".format(bench_name))
+    imgs = []
+    for bench_name in benchs:
+        imgs.append(Image.open("target/plot_{}.png".format(bench_name)))
+    concat_vertical(imgs, "target/out.png")
 
 
 def main():
