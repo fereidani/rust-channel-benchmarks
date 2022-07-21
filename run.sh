@@ -4,7 +4,7 @@ IFS=$'\n\t'
 SLEEP_SEC=2
 cd "$(dirname "$0")"
 
-#cargo clean
+cargo clean
 
 mkdir -p target
 
