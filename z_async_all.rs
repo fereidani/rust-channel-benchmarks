@@ -65,12 +65,12 @@ async fn spsc<T: BenchType + 'static>(cap: Option<usize>) {
     let (tx, rx) = new(cap);
 
     let h = tokio::spawn(async move {
-        for i in 1..MESSAGES/10+1 {
+        for i in 1..MESSAGES+1 {
             tx.send(T::new(i)).await.unwrap();
         }
     });
 
-    for _ in 0..MESSAGES/10 {
+    for _ in 0..MESSAGES {
         rx.recv().await.unwrap().test()
     }
 
