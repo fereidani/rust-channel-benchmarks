@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import sys
+from turtle import width
+from unittest import TestCase
 import pygal
 
 
@@ -11,6 +13,8 @@ def read_data(files):
     for f in files:
         with open(f) as f:
             lines = f.readlines()
+            if len(lines) < 2:
+                continue
             name = lines[0].strip("\n ")
             if name not in names:
                 names.append(name)
@@ -24,11 +28,18 @@ def read_data(files):
                 if test_name not in benchs[test_cat]:
                     benchs[test_cat][test_name] = {}
                 benchs[test_cat][test_name][name] = float(nsecs)
-
     return benchs, names
 
 
 labels = ["seq", "spsc", "mpsc", "mpmc"]  # "select_rx", "select_both"
+variants = ["empty", "usize", "big"]
+
+
+def sortFn(key):
+    label, variant = key.split("(")
+    variant = variant[:-1]
+    v = labels.index(label)*10+variants.index(variant)*1
+    return v
 
 
 titles = {
@@ -111,8 +122,10 @@ def get_color(name):
 
 
 def make_rows(bench_name, bench, names):
-    bench_keys = sorted(bench.keys())
-    x_labels = []
+    # bench_keys = sorted(bench.keys())
+    bench_keys = list(bench.keys())
+    bench_keys.sort(key=sortFn)
+    x_labels = bench_keys
     for label in labels:
         if label in bench_keys:
             x_labels.append(label)
@@ -132,7 +145,7 @@ def make_rows(bench_name, bench, names):
         #    rows.append((name, row))
         #    print(name, row)
         rows.append((name, row))
-    print(rows)
+    print(x_labels)
     return rows, x_labels
     # print(bench)
 
@@ -151,7 +164,7 @@ def chart(benchs, names):
     for bench_name in benchs:
         bench = benchs[bench_name]
         rows, label_list = make_rows(bench_name, bench, names)
-        x_labels = []
+        x_labels = label_list  # []
         for label in labels:
             if label in label_list:
                 x_labels.append(label)
@@ -163,6 +176,8 @@ def chart(benchs, names):
             value_colors=bar_colors,
         )
         chart = pygal.Bar(
+            width=1200,
+            height=350,
             legend_at_bottom=True,
             print_values=True,
             print_values_position='top',

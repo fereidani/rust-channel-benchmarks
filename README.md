@@ -32,6 +32,7 @@ Dependencies:
 - Python
   - pygal
   - cairosvg
+  - tk
 
 ### Contributing
 

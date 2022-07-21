@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euxo pipefail
 IFS=$'\n\t'
-SLEEP_SEC=5
+SLEEP_SEC=2
 cd "$(dirname "$0")"
 
-#rm -rf *.csv
+#cargo clean
 
 mkdir -p target
 
@@ -39,3 +39,8 @@ sleep $SLEEP_SEC
 ./target/release/go_bench | tee target/go.csv
 
 ./plot.py target/*.csv
+
+echo "Test Environment:"
+uname -srvp
+rustc --version
+go version

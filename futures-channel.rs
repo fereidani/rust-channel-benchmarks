@@ -2,65 +2,81 @@ use futures::channel::mpsc;
 use futures::executor::{block_on, ThreadPool};
 use futures::{future, stream, SinkExt, StreamExt};
 
-mod message;
+std::include!("z_types.rs");
+std::include!("settings.rs");
+std::include!("z_run.rs");
 
-std::include!("settings.in");
-
-fn seq_unbounded() {
+fn seq_unbounded<T: BenchType + 'static>() {
     block_on(async {
         let (tx, rx) = mpsc::unbounded();
-        for i in 0..MESSAGES {
-            tx.unbounded_send(message::new(i)).unwrap();
+        for i in 1..MESSAGES + 1 {
+            tx.unbounded_send(T::new(i)).unwrap();
         }
         drop(tx);
 
-        rx.for_each(|_| future::ready(())).await
+        rx.for_each(|t| {
+            t.test();
+            future::ready(())
+        })
+        .await
     });
 }
 
-fn seq_bounded(cap: usize) {
+fn seq_bounded<T: BenchType + 'static>(cap: usize) {
     let (mut tx, rx) = mpsc::channel(cap);
     block_on(async {
-        for i in 0..MESSAGES {
-            tx.try_send(message::new(i)).unwrap();
+        for i in 1..MESSAGES + 1 {
+            tx.try_send(T::new(i)).unwrap();
         }
         drop(tx);
 
-        rx.for_each(|_| future::ready(())).await
+        rx.for_each(|t| {
+            t.test();
+            future::ready(())
+        })
+        .await
     });
 }
 
-fn spsc_unbounded() {
+fn spsc_unbounded<T: BenchType + 'static>() {
     let pool = ThreadPool::new().unwrap();
     block_on(async {
         let (mut tx, rx) = mpsc::unbounded();
 
         pool.spawn_ok(async move {
-            tx.send_all(&mut stream::iter((0..MESSAGES).map(message::new).map(Ok)))
+            tx.send_all(&mut stream::iter((1..MESSAGES + 1).map(T::new).map(Ok)))
                 .await
                 .unwrap()
         });
 
-        rx.for_each(|_| future::ready(())).await
+        rx.for_each(|t| {
+            t.test();
+            future::ready(())
+        })
+        .await
     });
 }
 
-fn spsc_bounded(cap: usize) {
+fn spsc_bounded<T: BenchType + 'static>(cap: usize) {
     let pool = ThreadPool::new().unwrap();
     block_on(async {
         let (mut tx, rx) = mpsc::channel(cap);
 
         pool.spawn_ok(async move {
-            tx.send_all(&mut stream::iter((0..MESSAGES).map(message::new).map(Ok)))
+            tx.send_all(&mut stream::iter((1..MESSAGES + 1).map(T::new).map(Ok)))
                 .await
                 .unwrap()
         });
 
-        rx.for_each(|_| future::ready(())).await
+        rx.for_each(|t| {
+            t.test();
+            future::ready(())
+        })
+        .await
     });
 }
 
-fn mpsc_unbounded() {
+fn mpsc_unbounded<T: BenchType + 'static>() {
     let pool = ThreadPool::new().unwrap();
     block_on(async {
         let (tx, rx) = mpsc::unbounded();
@@ -69,7 +85,7 @@ fn mpsc_unbounded() {
             let mut tx = tx.clone();
             pool.spawn_ok(async move {
                 tx.send_all(&mut stream::iter(
-                    (0..MESSAGES / THREADS).map(message::new).map(Ok),
+                    (1..MESSAGES / THREADS + 1).map(T::new).map(Ok),
                 ))
                 .await
                 .unwrap()
@@ -77,11 +93,15 @@ fn mpsc_unbounded() {
         }
         drop(tx);
 
-        rx.for_each(|_| future::ready(())).await
+        rx.for_each(|t| {
+            t.test();
+            future::ready(())
+        })
+        .await
     });
 }
 
-fn mpsc_bounded(cap: usize) {
+fn mpsc_bounded<T: BenchType + 'static>(cap: usize) {
     let pool = ThreadPool::new().unwrap();
     block_on(async {
         let (tx, rx) = mpsc::channel(cap);
@@ -90,7 +110,7 @@ fn mpsc_bounded(cap: usize) {
             let mut tx = tx.clone();
             pool.spawn_ok(async move {
                 tx.send_all(&mut stream::iter(
-                    (0..MESSAGES / THREADS).map(message::new).map(Ok),
+                    (1..MESSAGES / THREADS + 1).map(T::new).map(Ok),
                 ))
                 .await
                 .unwrap()
@@ -98,79 +118,62 @@ fn mpsc_bounded(cap: usize) {
         }
         drop(tx);
 
-        rx.for_each(|_| future::ready(())).await
-    });
-}
-
-fn select_rx_unbounded() {
-    let pool = ThreadPool::new().unwrap();
-    block_on(async {
-        let chans = (0..THREADS).map(|_| mpsc::unbounded()).collect::<Vec<_>>();
-
-        for (tx, _) in &chans {
-            let tx = tx.clone();
-            pool.spawn_ok(async move {
-                for i in 0..MESSAGES / THREADS {
-                    tx.unbounded_send(message::new(i)).unwrap();
-                }
-            });
-        }
-
-        stream::select_all(chans.into_iter().map(|(_, rx)| rx))
-            .for_each(|_| future::ready(()))
-            .await
-    });
-}
-
-fn select_rx_bounded(cap: usize) {
-    let pool = ThreadPool::new().unwrap();
-    block_on(async {
-        let chans = (0..THREADS).map(|_| mpsc::channel(cap)).collect::<Vec<_>>();
-
-        for (tx, _) in &chans {
-            let mut tx = tx.clone();
-            pool.spawn_ok(async move {
-                tx.send_all(&mut stream::iter(
-                    (0..MESSAGES / THREADS).map(message::new).map(Ok),
-                ))
-                .await
-                .unwrap()
-            });
-        }
-
-        stream::select_all(chans.into_iter().map(|(_, rx)| rx))
-            .for_each(|_| future::ready(()))
-            .await
+        rx.for_each(|t| {
+            t.test();
+            future::ready(())
+        })
+        .await
     });
 }
 
 fn main() {
-    macro_rules! run {
-        ($name:expr, $f:expr) => {
-            let now = ::std::time::Instant::now();
-            $f;
-            let elapsed = now.elapsed();
-            println!("{},{}", $name, elapsed.as_nanos());
-        };
-    }
-
     println!("futures-channel");
 
-    run!("bounded0_mpsc", mpsc_bounded(0));
-    run!("bounded0_select_rx", select_rx_bounded(0));
-    run!("bounded0_spsc", spsc_bounded(0));
+    run!("bounded0_mpsc(empty)", mpsc_bounded::<BenchEmpty>(0));
+    run!("bounded0_spsc(empty)", spsc_bounded::<BenchEmpty>(0));
 
-    run!("bounded1_mpsc", mpsc_bounded(1));
-    run!("bounded1_select_rx", select_rx_bounded(1));
-    run!("bounded1_spsc", spsc_bounded(1));
+    run!("bounded1_mpsc(empty)", mpsc_bounded::<BenchEmpty>(1));
+    run!("bounded1_spsc(empty)", spsc_bounded::<BenchEmpty>(1));
 
-    run!("bounded_mpsc", mpsc_bounded(MESSAGES));
-    run!("bounded_select_rx", select_rx_bounded(MESSAGES));
-    run!("bounded_seq", seq_bounded(MESSAGES));
-    run!("bounded_spsc", spsc_bounded(MESSAGES));
+    run!("bounded_mpsc(empty)", mpsc_bounded::<BenchEmpty>(MESSAGES));
+    run!("bounded_seq(empty)", seq_bounded::<BenchEmpty>(MESSAGES));
+    run!("bounded_spsc(empty)", spsc_bounded::<BenchEmpty>(MESSAGES));
 
-    run!("unbounded_mpsc", mpsc_unbounded());
-    run!("unbounded_select_rx", select_rx_unbounded());
-    run!("unbounded_seq", seq_unbounded());
-    run!("unbounded_spsc", spsc_unbounded());
+    run!("unbounded_mpsc(empty)", mpsc_unbounded::<BenchEmpty>());
+    run!("unbounded_seq(empty)", seq_unbounded::<BenchEmpty>());
+    run!("unbounded_spsc(empty)", spsc_unbounded::<BenchEmpty>());
+
+    run!("bounded0_mpsc(usize)", mpsc_bounded::<BenchUsize>(0));
+    run!("bounded0_spsc(usize)", spsc_bounded::<BenchUsize>(0));
+
+    run!("bounded1_mpsc(usize)", mpsc_bounded::<BenchUsize>(1));
+    run!("bounded1_spsc(usize)", spsc_bounded::<BenchUsize>(1));
+
+    run!("bounded_mpsc(usize)", mpsc_bounded::<BenchUsize>(MESSAGES));
+    run!("bounded_seq(usize)", seq_bounded::<BenchUsize>(MESSAGES));
+    run!("bounded_spsc(usize)", spsc_bounded::<BenchUsize>(MESSAGES));
+
+    run!("unbounded_mpsc(usize)", mpsc_unbounded::<BenchUsize>());
+    run!("unbounded_seq(usize)", seq_unbounded::<BenchUsize>());
+    run!("unbounded_spsc(usize)", spsc_unbounded::<BenchUsize>());
+
+    run!("bounded0_mpsc(big)", mpsc_bounded::<BenchFixedArray>(0));
+    run!("bounded0_spsc(big)", spsc_bounded::<BenchFixedArray>(0));
+
+    run!("bounded1_mpsc(big)", mpsc_bounded::<BenchFixedArray>(1));
+    run!("bounded1_spsc(big)", spsc_bounded::<BenchFixedArray>(1));
+
+    run!(
+        "bounded_mpsc(big)",
+        mpsc_bounded::<BenchFixedArray>(MESSAGES)
+    );
+    run!("bounded_seq(big)", seq_bounded::<BenchFixedArray>(MESSAGES));
+    run!(
+        "bounded_spsc(big)",
+        spsc_bounded::<BenchFixedArray>(MESSAGES)
+    );
+
+    run!("unbounded_mpsc(big)", mpsc_unbounded::<BenchFixedArray>());
+    run!("unbounded_seq(big)", seq_unbounded::<BenchFixedArray>());
+    run!("unbounded_spsc(big)", spsc_unbounded::<BenchFixedArray>());
 }
