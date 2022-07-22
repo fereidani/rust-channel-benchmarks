@@ -186,7 +186,8 @@ def chart(benchs, names):
             margin=5,
             width=1200,
             height=350,
-            max_scale=5,
+            max_scale=10,
+            min_scale=10,
             # legend_at_bottom=True,
             print_values=True,
             print_values_position='top',
@@ -201,7 +202,10 @@ def chart(benchs, names):
         chart.render_to_png("target/plot_{}.png".format(bench_name))
         chart.render_to_file("target/plot_{}.svg".format(bench_name))
     imgs = []
-    for bench_name in benchs:
+    for bench_name in ["bounded0",
+                       "bounded1",
+                       "bounded",
+                       "unbounded"]:
         imgs.append(Image.open("target/plot_{}.png".format(bench_name)))
     concat_vertical(imgs, "target/results.png")
 
