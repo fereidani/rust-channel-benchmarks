@@ -4,16 +4,17 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
-async-channel = "1.6.1"
+async-channel = "1.7"
 crossbeam = "0.8"
 crossbeam-channel = "0.5"
 flume = "0.10"
 futures = { version = "0.3", features = ["thread-pool"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
-kanal= "0.1.0-beta2"
+kanal = "0.1.0-pre1"
 
 [profile.release]
 opt-level = 3
+rustc-env = {target-cpus = "native", tune-cpu = "native"}
 debug = false
 overflow-checks = false
 lto = 'thin'

@@ -20,7 +20,7 @@ def read_data(files):
             if name not in names:
                 names.append(name)
             for line in lines[1:]:
-                test, nsecs = line.strip("\n ").split(",")
+                test, nsecs, ops = line.strip("\n ").split(",")
                 splt = test.split('_')
                 test_cat = splt[0]
                 test_name = '_'.join(splt[1:])
@@ -186,14 +186,13 @@ def chart(benchs, names):
             margin=5,
             width=1200,
             height=350,
-            max_scale=10,
-            min_scale=10,
             # legend_at_bottom=True,
             print_values=True,
             print_values_position='top',
             value_formatter=lambda x: '{}x'.format(
                 x) if x > 0 else "N/A*",
-            style=custom_style)
+            style=custom_style
+        )
         chart.title = titles[bench_name]
         chart.x_labels = x_labels
         normalize_rows(rows)

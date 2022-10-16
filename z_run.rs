@@ -16,7 +16,12 @@ macro_rules! run {
                 break;
             }
         }
-        println!("{},{}", $name, (sum_elapsed / count).as_nanos());
+        println!(
+            "{},{},{}",
+            $name,
+            (sum_elapsed / count).as_nanos(),
+            ((count as f64 * MESSAGES as f64) / sum_elapsed.as_secs_f64()).round()
+        );
     };
 }
 
@@ -35,6 +40,11 @@ macro_rules! run_async {
                 break;
             }
         }
-        println!("{},{}", $name, (sum_elapsed / count).as_nanos());
+        println!(
+            "{},{},{}",
+            $name,
+            (sum_elapsed / count).as_nanos(),
+            ((count as f64 * MESSAGES as f64) / sum_elapsed.as_secs_f64()).round()
+        );
     };
 }

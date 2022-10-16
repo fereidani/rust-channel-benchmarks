@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-const MESSAGES = 100000
+const MESSAGES = 500000
 const THREADS = 4
-const MIN_BENCH_TIME = 500
+const MIN_BENCH_TIME = 1000
 
 func NewBig(i uint) [4]uint {
 	return [4]uint{i, i, i, i}
@@ -298,7 +298,7 @@ func run(name string, f func(int), cap int) {
 			break
 		}
 	}
-	fmt.Printf("%s,%d\n", name, sum_elapsed/count)
+	fmt.Printf("%s,%d,%d\n", name, sum_elapsed/count, int64(float64(count*MESSAGES)/sum_elapsed.Seconds()))
 }
 
 func main() {
