@@ -52,40 +52,49 @@ async fn mpsc<T: BenchType + 'static>(cap: Option<usize>) {
         list.push(h);
     }
 
-    for _ in 0..MESSAGES {
-        rx.recv_async().await.unwrap().test()
-    }
+    list.push(tokio::spawn(async move {
+        for _ in 0..MESSAGES {
+            rx.recv_async().await.unwrap().test()
+        }
+    }));
+
     for h in list {
         h.await.unwrap();
     }
 }
 
-async fn seq<T: BenchType>(cap: Option<usize>) {
-    let (tx, rx) = new(cap);
-
-    for i in 1..MESSAGES + 1 {
-        tx.send_async(T::new(i)).await.unwrap();
-    }
-
-    for _ in 0..MESSAGES {
-        rx.recv_async().await.unwrap().test()
-    }
-}
-
-async fn spsc<T: BenchType + 'static>(cap: Option<usize>) {
+async fn seq<T: BenchType + 'static>(cap: Option<usize>) {
     let (tx, rx) = new(cap);
 
     let h = tokio::spawn(async move {
         for i in 1..MESSAGES + 1 {
             tx.send_async(T::new(i)).await.unwrap();
         }
+
+        for _ in 0..MESSAGES {
+            rx.recv_async().await.unwrap().test()
+        }
     });
 
-    for _ in 0..MESSAGES {
-        rx.recv_async().await.unwrap().test()
-    }
-
     h.await.unwrap();
+}
+
+async fn spsc<T: BenchType + 'static>(cap: Option<usize>) {
+    let (tx, rx) = new(cap);
+
+    let htx = tokio::spawn(async move {
+        for i in 1..MESSAGES + 1 {
+            tx.send_async(T::new(i)).await.unwrap();
+        }
+    });
+    let hrx = tokio::spawn(async move {
+        for _ in 0..MESSAGES {
+            rx.recv_async().await.unwrap().test()
+        }
+    });
+
+    htx.await.unwrap();
+    hrx.await.unwrap();
 }
 
 #[tokio::main]
