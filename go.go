@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-const MESSAGES = 500000
+const MESSAGES = 1000000
 const THREADS = 4
-const MIN_BENCH_TIME = 1000
+const MIN_BENCH_TIME = 2000
 
 func NewBig(i uint) [4]uint {
 	return [4]uint{i, i, i, i}
