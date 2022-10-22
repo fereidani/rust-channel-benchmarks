@@ -1,4 +1,5 @@
 #!/bin/bash
+export RUSTFLAGS="-C target-cpu=native"
 set -euxo pipefail
 IFS=$'\n\t'
 SLEEP_SEC=2
