@@ -10,11 +10,10 @@ crossbeam-channel = "0.5"
 flume = "0.10"
 futures = { version = "0.3", features = ["thread-pool"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
-kanal = "0.1.0-pre1"
+kanal = { git = "https://github.com/fereidani/kanal" }
 
 [profile.release]
 opt-level = 3
-rustc-env = {target-cpus = "native", tune-cpu = "native"}
 debug = false
 overflow-checks = false
 lto = 'thin'
