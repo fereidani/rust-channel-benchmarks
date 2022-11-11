@@ -9,8 +9,8 @@ from PIL import Image
 def read_data(files):
     benchs = {}
     # only to keep list shorted
-    names = ["kanal", "kanal-async",
-             "crossbeam-channel", "flume", "flume-async", "std::mpsc", "futures-channel"]
+    names = ["kanal", "kanal-async", "kanal-std-mutex", "kanal-std-mutex-async",
+             "crossbeam-channel", "flume", "flume-async", "async-channel", "std::mpsc", "futures-channel"]
     for f in files:
         with open(f) as f:
             lines = f.readlines()
@@ -28,7 +28,8 @@ def read_data(files):
                     benchs[test_cat] = {}
                 if test_name not in benchs[test_cat]:
                     benchs[test_cat][test_name] = {}
-                benchs[test_cat][test_name][name] = float(nsecs)
+                #benchs[test_cat][test_name][name] = float(nsecs)
+                benchs[test_cat][test_name][name] = float(ops)
     return benchs, names
 
 
@@ -44,10 +45,10 @@ def sortFn(key):
 
 
 titles = {
-    "bounded0": "Bounded Channel With Size 0 Benchmark\n(Relative time, lower is better)",
-    "bounded1": "Bounded Channel With Size 1 Benchmark\n(Relative time, lower is better)",
-    "bounded": "Bounded Channel With Size N Benchmark\n(Relative time, lower is better)",
-    "unbounded": "Unbounded Channel Benchmark\n(Relative time, lower is better)",
+    "bounded0": "Bounded Channel With Size 0 Benchmark\n(Operations per second, Higher is better)",
+    "bounded1": "Bounded Channel With Size 1 Benchmark\n(Operations per second, Higher is better)",
+    "bounded": "Bounded Channel With Size N Benchmark\n(Operations per second, Higher is better)",
+    "unbounded": "Unbounded Channel Benchmark\n(Operations per second, Higher is better)",
 }
 
 
@@ -85,7 +86,8 @@ color_set = {
     'darksalmon': '#e9967a',
     'darkviolet': '#9400d3',
     'fuchsia': '#ff00ff',
-    'gold': '#ffd700',
+    'gold': '#dbb900',
+    'lightgold': '#fad302',
     'azure': '#19ffae',
     'indigo': '#4b0082',
     'khaki': '#f0e68c',
@@ -99,6 +101,8 @@ color_set = {
 colors = {
     "kanal": "green",
     "kanal-async": "azure",
+    "kanal-std-mutex": "gold",
+    "kanal-std-mutex-async": "lightgold",
     "go": "blue",
     "flume": "purple",
     "flume-async": "lightpurple",
@@ -153,6 +157,16 @@ def normalize_rows(rows):
             name, [round(i / j, 2) if i is not None else 0 for i, j in zip(row, norm)])
 
 
+def set_zero_none_fields(rows):
+    norm = []
+    for (name, row) in rows:
+        if name == "kanal":
+            norm = row
+    for idx, (name, row) in enumerate(rows):
+        rows[idx] = (
+            name, [i if i is not None else 0 for i, j in zip(row, norm)])
+
+
 def concat_vertical(imgs, to):
     height_sum = 0
     for img in imgs:
@@ -186,16 +200,18 @@ def chart(benchs, names):
             margin=5,
             width=1200,
             height=350,
-            # legend_at_bottom=True,
+            legend_at_bottom=True,
             print_values=True,
             print_values_position='top',
-            value_formatter=lambda x: '{}x'.format(
-                x) if x > 0 else "N/A*",
+            value_formatter=lambda x: '{}M'.format(
+                round(x/1e6, 1) if x > 1e5 else round(x/1e6, 2)
+            ) if x > 0 else "N/A",
             style=custom_style
         )
         chart.title = titles[bench_name]
         chart.x_labels = x_labels
-        normalize_rows(rows)
+        # normalize_rows(rows)
+        set_zero_none_fields(rows)
         for (name, row) in rows:
             chart.add(name, row)
         chart.render_to_png("target/plot_{}.png".format(bench_name))

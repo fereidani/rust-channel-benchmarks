@@ -1,18 +1,5 @@
 # Rust Channel Benchmarks
 This is a highly modified fork of the crossbeam-channel benchmarks. to keep track of Kanal library stats in comparison with other competitors.
-### Tests
-
-* `seq`: A single thread sends `N` messages. Then it receives `N` messages.
-* `spsc`: One thread sends `N` messages. Another thread receives `N` messages.
-* `mpsc`: `T` threads send `N / T` messages each. One thread receives `N` messages.
-* `mpmc`: `T` threads send `N / T` messages each. `T` other threads receive `N / T` messages each.
-* `select_rx`: `T` threads send `N / T` messages each into a separate channel. Another thread receives `N` messages by selecting over the `T` channels.
-* `select_both`: `T` threads send `N / T` messages each by selecting over `T` channels. `T` other threads receive `N / T` messages each by selecting over the `T` channels.
-
-Default configuration:
-
-- `N = 5000000`
-- `T = 4`
 
 ### Running
 
@@ -27,6 +14,7 @@ Dependencies:
 
 - Rust (latest)
 - Go
+- Git
 - Bash
 - libcairo2-dev
 - Python
@@ -39,13 +27,23 @@ Dependencies:
 
 You can follow [community benchmarks](https://github.com/fereidani/rust-channel-benchmarks/issues?q=label%3Abenchmark), and also share your results by opening an issue with the format shown in [results](#Results) section.
 
-### Results
+### Benchmark Results
+Results are based on how many messages can be passed in each scenario per second.
 
+1. empty tests are those tests that are passing zero-sized message like notifications to receivers.
+1. usize tests are those tests that are passing messages of register size to receivers.
+1. big tests are those tests that are passing messages of 4x the size of the register to receivers, for example, 32 bytes(4x8) structure for x64 systems.
+
+N/A means that the test subject can't perform the test because of its limitations, for example, some libraries don't have support for size 0 channels or MPMC.
 
 Machine: `AMD Ryzen Threadripper 2950X 16-Core Processor`<br />
-Rust: `rustc rustc 1.64.0`<br />
-Go: `go version go1.19.2 linux/amd64`<br />
-OS (`uname -a`): `Linux 5.13.0-35-generic #40~20.04.1-Ubuntu SMP Mon Mar 7 09:18:32 UTC 2022 x86_64`<br />
-Date: Oct 16, 2022
+Rust: `rustc 1.65.0 (897e37553 2022-11-02)`<br />
+Go: `go version go1.19.3 linux/amd64`<br />
+OS (`uname -a`): `Linux 5.15.0-52-generic #58~20.04.1-Ubuntu SMP Thu Oct 13 13:09:46 UTC 2022 x86_64`<br />
+Date: Nov 11, 2022
 
-![Benchmarks](https://i.imgur.com/gHfk5fy.png)
+![Benchmarks](https://i.imgur.com/QK1UOyW.png)
+
+#### Why in some tests async is much faster than sync?
+It's because of Tokio's context-switching performance, like Golang, Tokio context-switch in the same thread to the next coroutine when the channel message is ready which is much cheaper than communicating between different threads, It's the same reason why async network applications usually perform better than sync implementations.
+As channel size grows you see better performance in sync benchmarks because channel sender threads can push their data directly to the channel queue and don't need to wait for signals from receivers threads.

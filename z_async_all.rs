@@ -1,4 +1,3 @@
-
 async fn mpmc<T: BenchType + 'static>(cap: Option<usize>) {
     let (tx, rx) = new(cap);
     let mut list = Vec::new();
@@ -56,7 +55,7 @@ async fn seq<T: BenchType + 'static>(cap: Option<usize>) {
     let (tx, rx) = new(cap);
 
     let h = tokio::spawn(async move {
-        for i in 1..MESSAGES+1 {
+        for i in 1..MESSAGES + 1 {
             tx.send(T::new(i)).await.unwrap();
         }
 
@@ -72,7 +71,7 @@ async fn spsc<T: BenchType + 'static>(cap: Option<usize>) {
     let (tx, rx) = new(cap);
 
     let htx = tokio::spawn(async move {
-        for i in 1..MESSAGES+1 {
+        for i in 1..MESSAGES + 1 {
             tx.send(T::new(i)).await.unwrap();
         }
     });

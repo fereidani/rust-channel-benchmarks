@@ -5,7 +5,11 @@ IFS=$'\n\t'
 SLEEP_SEC=2
 cd "$(dirname "$0")"
 
+rm -rf kanal2
+git clone https://github.com/fereidani/kanal/ kanal2 # hack to be able to reimport kanal with cargo
+
 cargo clean
+cargo update
 
 mkdir -p target
 
@@ -17,6 +21,8 @@ cargo build --release --bin crossbeam-channel
 cargo build --release --bin async-channel
 cargo build --release --bin kanal
 cargo build --release --bin kanal-async
+cargo build --release --bin kanal-std-mutex
+cargo build --release --bin kanal-std-mutex-async
 go build -o target/release/go_bench go.go
 
 
@@ -36,6 +42,10 @@ sleep $SLEEP_SEC
 ./target/release/kanal | tee target/kanal.csv
 sleep $SLEEP_SEC
 ./target/release/kanal-async | tee target/kanal-async.csv
+sleep $SLEEP_SEC 
+./target/release/kanal-std-mutex | tee target/kanal-std-mutex.csv
+sleep $SLEEP_SEC
+./target/release/kanal-std-mutex-async | tee target/kanal-std-mutex-async.csv
 sleep $SLEEP_SEC 
 ./target/release/go_bench | tee target/go.csv
 

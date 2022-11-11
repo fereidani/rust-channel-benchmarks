@@ -11,6 +11,7 @@ flume = "0.10"
 futures = { version = "0.3", features = ["thread-pool"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 kanal = { git = "https://github.com/fereidani/kanal" }
+kanal-std-mutex = { path = "kanal2", features = ["std-mutex"], package = "kanal" }
 
 [profile.release]
 opt-level = 3
@@ -35,6 +36,16 @@ doc = false
 [[bin]]
 name = "kanal-async"
 path = "kanal-async.rs"
+doc = false
+
+[[bin]]
+name = "kanal-std-mutex"
+path = "kanal-std-mutex.rs"
+doc = false
+
+[[bin]]
+name = "kanal-std-mutex-async"
+path = "kanal-std-mutex-async.rs"
 doc = false
 
 [[bin]]
