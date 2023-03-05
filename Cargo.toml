@@ -11,7 +11,7 @@ flume = "0.10"
 futures = { version = "0.3", features = ["thread-pool"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 kanal = { git = "https://github.com/fereidani/kanal" }
-kanal-std-mutex = {path = "kanal2", features = ["std-mutex"], package = "kanal" }
+kanal-std-mutex = { path = "kanal2", features = ["std-mutex"], package = "kanal" }
 monoio = "0.0.9"
 local-sync = "0.0.5"
 
