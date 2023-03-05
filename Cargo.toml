@@ -101,4 +101,6 @@ path = "local_sync.rs"
 doc = false
 
 [patch.crates-io]
-local-sync = { git = "https://github.com/Wireless4024/local-sync.git", branch = "clone_on_T_!clone" }
+# Remove this when this pr got merged https://github.com/monoio-rs/local-sync/pull/1 and new release come out
+# rev is used to avoid `supply chain attack`
+local-sync = { git = "https://github.com/Wireless4024/local-sync.git", rev = "a55969a8" }
