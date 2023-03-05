@@ -42,9 +42,7 @@ def read_data(files):
                 #benchs[test_cat][test_name][name] = float(nsecs)
                 benchs[test_cat][test_name][name] = float(ops)
 
-    print(names)
     names.sort(key=key_of)
-    print(names)
     return benchs, names
 
 
