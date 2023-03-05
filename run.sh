@@ -12,6 +12,7 @@ cargo clean
 cargo update
 
 mkdir -p target
+rm target/*.csv
 
 cargo build --release --bin mpsc
 cargo build --release --bin futures-channel

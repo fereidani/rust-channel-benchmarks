@@ -5,12 +5,23 @@ from unittest import TestCase
 import pygal
 from PIL import Image
 
+name_ordering = ["kanal", "crossbeam", "flume", "async-channel", "std::mpsc", "futures-channel"]
+
+def key_of(name):
+    idx = 0
+    for i in name_ordering:
+        if name.startswith(i):
+            return idx
+        idx += 1
+    name_ordering.append(name)
+    return idx
 
 def read_data(files):
     benchs = {}
     # only to keep list shorted
-    names = ["kanal", "kanal-async", "kanal-std-mutex", "kanal-std-mutex-async",
-             "crossbeam-channel", "flume", "flume-async", "async-channel", "std::mpsc", "futures-channel"]
+    #names = ["kanal", "kanal-async", "kanal-std-mutex", "kanal-std-mutex-async",
+    #         "crossbeam-channel", "flume", "flume-async", "async-channel", "std::mpsc", "futures-channel"]
+    names = ["kanal"]
     for f in files:
         with open(f) as f:
             lines = f.readlines()
@@ -30,6 +41,10 @@ def read_data(files):
                     benchs[test_cat][test_name] = {}
                 #benchs[test_cat][test_name][name] = float(nsecs)
                 benchs[test_cat][test_name][name] = float(ops)
+
+    print(names)
+    names.sort(key=key_of)
+    print(names)
     return benchs, names
 
 

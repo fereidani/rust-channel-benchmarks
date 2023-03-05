@@ -11,7 +11,9 @@ flume = "0.10"
 futures = { version = "0.3", features = ["thread-pool"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 kanal = { git = "https://github.com/fereidani/kanal" }
-kanal-std-mutex = { path = "kanal2", features = ["std-mutex"], package = "kanal" }
+kanal-std-mutex = {path = "kanal2", features = ["std-mutex"], package = "kanal" }
+monoio = "0.0.9"
+local-sync = "0.0.5"
 
 [profile.release]
 opt-level = 3
@@ -73,3 +75,30 @@ name = "async-channel"
 path = "async-channel.rs"
 doc = false
 
+[[bin]]
+name = "kanal-local"
+path = "kanal-local.rs"
+doc = false
+
+[[bin]]
+name = "kanal-local-monoio"
+path = "kanal-local-monoio.rs"
+doc = false
+
+[[bin]]
+name = "flume-monoio"
+path = "flume-monoio.rs"
+doc = false
+
+[[bin]]
+name = "futures-channel-local"
+path = "futures-channel-local.rs"
+doc = false
+
+[[bin]]
+name = "local_sync"
+path = "local_sync.rs"
+doc = false
+
+[patch.crates-io]
+local-sync = { git = "https://github.com/Wireless4024/local-sync.git", branch = "clone_on_T_!clone" }

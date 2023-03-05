@@ -9,6 +9,13 @@ Runs benchmarks, stores results into `*.csv` files in the target folder, and gen
 # Results will be saved in `target`.
 ./run.sh
 ```
+Run local benchmark. This used to determine performance in thread-per-core application.
+```bash
+# run local benchmark
+./run-local.sh
+```
+> `local` in this context is stand for `Future + !Send + !Sync` (data are never send to other thread),
+> mpsc/mpmc are done in concurrency instead of parallel.
 
 Dependencies:
 
@@ -21,7 +28,7 @@ Dependencies:
   - pygal
   - cairosvg
   - tk
-  - PIL
+  - PIL (pillow)
 
 ### Contributing
 
