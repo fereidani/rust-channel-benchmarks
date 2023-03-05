@@ -15,6 +15,7 @@ cargo build --release --bin kanal-local
 cargo build --release --bin kanal-local-monoio
 cargo build --release --bin flume-monoio
 cargo build --release --bin futures-channel-local
+cargo build --release --bin futures-channel-local-monoio
 cargo build --release --bin local_sync
 
 sleep $SLEEP_SEC
@@ -25,6 +26,8 @@ sleep $SLEEP_SEC
 ./target/release/flume-monoio | tee target/flume-monoio.csv
 sleep $SLEEP_SEC
 ./target/release/futures-channel-local | tee target/futures-channel-local.csv
+sleep $SLEEP_SEC
+./target/release/futures-channel-local-monoio | tee target/futures-channel-local-monoio.csv
 sleep $SLEEP_SEC
 ./target/release/local_sync | tee target/local_sync.csv
 

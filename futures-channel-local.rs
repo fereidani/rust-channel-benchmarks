@@ -126,7 +126,7 @@ fn mpsc_bounded<T: BenchType + 'static>(cap: usize) {
 }
 
 fn main() {
-    println!("futures-channel");
+    println!("futures-channel-local");
 
     run!("bounded0_mpsc(empty)", mpsc_bounded::<BenchEmpty>(0));
     run!("bounded0_spsc(empty)", spsc_bounded::<BenchEmpty>(0));

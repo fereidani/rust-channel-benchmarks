@@ -96,6 +96,11 @@ path = "futures-channel-local.rs"
 doc = false
 
 [[bin]]
+name = "futures-channel-local-monoio"
+path = "futures-channel-local-monoio.rs"
+doc = false
+
+[[bin]]
 name = "local_sync"
 path = "local_sync.rs"
 doc = false
